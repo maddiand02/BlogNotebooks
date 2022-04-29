@@ -1,0 +1,163 @@
+---
+title: 'Are the Chicago White Sox doomed? Or are they just off to a rough start? '
+author: 'Maddi Anderson '
+date: '2022-04-29'
+slug: are-the-chicago-white-sox-doomed-or-are-they-just-off-to-a-rough-start
+categories: []
+tags: []
+---
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(tidyverse)
+library(cowplot)
+library(ggrepel)
+teambat22 <- read_csv("teambat22.csv") %>% mutate(season= 2022)
+teamfield22 <- read_csv("teamfield22.csv") %>% mutate(season= 2022)
+teampitch22 <- read_csv("teampitch22.csv") %>% mutate(season= 2022)
+teambat21 <- read_csv("teambat21.csv") %>% mutate(season= 2021)
+teamfield21 <- read_csv("teamfield21.csv") %>% mutate(season= 2021)
+teampitch21 <- read_csv("teampitch21.csv") %>% mutate(season= 2021)
+teambat <- bind_rows(teambat22, teambat21)
+teamfield <- bind_rows(teamfield22, teamfield21)
+teampitch <- bind_rows(teampitch22, teampitch21)
+cws <- teambat22 %>% filter(Tm == "Chicago White Sox") 
+cwstf <- teamfield22 %>% filter(Tm == "Chicago White Sox")
+cwstp <- teampitch22 %>% filter(Tm == "Chicago White Sox")
+cws21 <- teambat21 %>% filter(Tm == "Chicago White Sox") 
+cwstf21 <- teamfield21 %>% filter(Tm == "Chicago White Sox")
+cwstp21 <- teampitch21 %>% filter(Tm == "Chicago White Sox")
+ladtf21 <- teamfield21 %>% filter(Tm == "Los Angeles Dodgers")
+ladtf22 <- teamfield22 %>% filter(Tm == "Los Angeles Dodgers")
+```
+The Chicago White Sox have been a hot topic for the past few years. After going through a rigorous rebuild, many people are expecting them to win a World Series title in the next couple years. The problem is, the White Sox are currently a "win now" team. They have all the talent they need, but they are struggling to come together as one. 
+
+Comparing the 2021 and 2022 seasons is a heartbreaking sight. The White Sox went from having some of the best statistics of 2021 to being at the bottom of the charts in 2022. So, what went wrong? 
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+bar1 <- ggplot() + 
+  geom_bar(data=teambat21, aes(x=reorder(Tm, `OPS+`), weight=`OPS+`), fill="grey") + 
+  geom_bar(data=cws21, aes(x=reorder(Tm, `OPS+`), weight=`OPS+`), fill="black") +
+  coord_flip()+
+  labs(title="The CWS Dominated in 2021...", subtitle="The White Sox are having a hard time getting on base this year, making it difficult to score runs.", y= "OPS+", x = "" , caption = "") +   theme_minimal()+
+  theme( 
+    legend.position = "none", 
+    panel.grid.major = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(face="bold" , size= 18)
+  )
+bar2 <- ggplot() + 
+  geom_bar(data=teambat22, aes(x=reorder(Tm, `OPS+`), weight=`OPS+`), fill="grey") + 
+  geom_bar(data=cws, aes(x=reorder(Tm, `OPS+`), weight=`OPS+`), fill="black") +
+  coord_flip()+ 
+  labs(title="But Not So Far In 2022 ", subtitle="", y= "OPS+", x = "" , caption = "Source: Baseball Refrence | Maddi Anderson") +   theme_minimal()+
+  theme( 
+    legend.position = "none", 
+    panel.grid.major = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(face="bold" , size= 18)
+  )
+plot_grid(bar1, bar2) 
+```
+
+In 2021, the White Sox had a great on base plus slugging percentage. They were efficient on getting runners on base and being able to drive them home. But looking at the 2022 season so far, OPS+ seems to be an area this team is struggling in. Keep in mind, the White Sox are currently missing two of their heavy hitters due to injury, so there is hope that the return of Moncada and Jimenez will improve this statistic. 
+
+We see that this 2022 team is struggling behind the plate, but what does our data look like for the pitchers? 
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+plot1 <- ggplot() + 
+  geom_point(data=teampitch21, aes(x=H, y=ER), color="grey") + 
+  geom_point(data=cwstp21, aes(x=H, y=ER), color="black") +
+  geom_text_repel(data=cwstp21, aes(x=H, y=ER, label=Tm), color="black") +
+  geom_vline(xintercept = 1316) +
+  geom_hline(yintercept = 734) +
+  geom_text(aes(x=1245 , y=860 , label= "League Average"), size=3, color="red") +
+  labs(title="Pitching Isn't The Biggest Problem For The White Sox", subtitle="The White Sox pitching last year was above average, but they are currently sitting in the middle.", y= "Runs Allowed", x = "Hits Allowed" , caption = "") +   theme_minimal()+
+  theme( 
+    legend.position = "none", 
+    panel.grid.major = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(face="bold" , size= 18)
+  )
+plot2 <- ggplot() + 
+  geom_point(data=teampitch22, aes(x=H, y=ER), color="grey") + 
+  geom_point(data=cwstp, aes(x=H, y=ER), color="black") +
+  geom_text(aes(x=120 , y=56, label= "Chicago White Sox"), size=4, color="black")+
+  geom_vline(xintercept = 145) +
+  geom_hline(yintercept = 77)  +
+  geom_point(data=cwstp, aes(x=H, y=ER), color="black") +
+  geom_text(aes(x=133 , y=90, label= "League Average"), size=3, color="red") +
+  labs(title="", subtitle=" ", y= "Runs Allowed", x = "Hits Allowed" , caption = "Source: Baseball Refrence | Maddi Anderson") +   theme_minimal()+
+  theme( 
+    legend.position = "none", 
+    panel.grid.major = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(face="bold" , size= 18)
+  )
+plot_grid(plot1, plot2) 
+```
+
+So far, pitching has not been their biggest issue in 2022. They are floating right around the average mark, keeping their data pretty consistent with the other teams. In comparison to the 2021 pitching data, the White Sox are struggling a bit, but they are not doomed quite yet. The season has just begun, and there is plenty of time to make up for the early season mistakes. 
+
+And the White Sox wouldn't be the White Sox without injuries. At the time of this article, there are currently seven pitchers on the IL (injured list), with only one of those pitchers being on the long term (60 day) IL. 
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+errorpergame22 <- teamfield22 %>%
+mutate(
+  EPG = E/G
+) %>%
+  select(Tm, season, EPG)
+errorpergame21 <- teamfield21 %>%
+mutate(
+  EPG = E/G
+) %>%
+  select(Tm, season, EPG)
+errorpergame <- bind_rows(errorpergame21, errorpergame22)
+cwserrors <- errorpergame %>% filter(Tm == "Chicago White Sox")
+laderrors <- errorpergame %>% filter(Tm == "Los Angeles Dodgers")
+cwserrors21 <- errorpergame %>% filter(Tm == "Chicago White Sox" & season == 2021)
+cwserrors22 <- errorpergame %>% filter(Tm == "Chicago White Sox" & season == 2022)
+laderrors21 <- errorpergame %>% filter(Tm == "Los Angeles Dodgers" & season == 2021)
+laderrors22 <- errorpergame %>% filter(Tm == "Los Angeles Dodgers" & season == 2022)
+```
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot() + 
+  geom_line(data=errorpergame, aes(x=season, y=EPG, group=Tm), color="grey")+
+  geom_point(data=errorpergame, aes(x=season, y=EPG, group=Tm), color="grey") +
+  geom_line(data=cwserrors, aes(x=season, y=EPG, group=Tm), color="black")+
+  geom_point(data=cwserrors, aes(x=season, y=EPG, group=Tm), color="black", size=2) +  
+  geom_line(data=cwserrors, aes(x=season, y=EPG, group=Tm), color="black")+
+  geom_point(data=cwserrors, aes(x=season, y=EPG, group=Tm), color="black", size=2) +
+  geom_line(data=laderrors, aes(x=season, y=EPG, group=Tm), color="blue")+
+  geom_point(data=laderrors, aes(x=season, y=EPG, group=Tm), color="blue", size=2) +
+  geom_text(data=cwserrors21, aes(x=season-.4, y=EPG, group=Tm, label=Tm)) + 
+  geom_text(data=cwserrors22, aes(x=season+.4, y=EPG, group=Tm, label=Tm)) + 
+  geom_text(data=laderrors21, aes(x=season-.4, y=EPG, group=Tm, label=Tm)) + 
+  geom_text(data=laderrors22, aes(x=season+.4, y=EPG, group=Tm, label=Tm)) +
+  scale_x_continuous(breaks=c(2021, 2022), limits=c(2020,2023)) +
+  labs(title="The White Sox Kept Up With One Of The Best", 
+       subtitle="In 2021 the White Sox kept errors under control, but in 2022 they are struggling to make routine plays.", 
+       y= "Average Erros Per Game", 
+       x = "", 
+       caption = "Source: Baseball Refrence | Maddi Anderson"
+       ) +   
+  theme_minimal()+
+  theme( 
+    legend.position = "none", 
+    panel.grid.major = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(face="bold" , size= 18))
+  
+```
+
+Out of all of the charts, this is the most painful one to look at. The White Sox were able to keep errors low enough to where they were nearly tied with one of the best teams in baseball during the 2021 season. Currently, the White Sox are first in something, but unfortunately that is errors. They are averaging about 1.25 errors per game, which is atrocious, especially this early in the season. If the White Sox want to improve their record, they better start by playing clean baseball and making routine plays. 
+
+So, are the White Sox truly doomed? With the data provided in these graphics, it is hard to think positively. But, the season has only just begun, and there is a lot of baseball left to be played. There is hope that the return of the injured players will complete the missing pieces that this team desperately needs. 
+
+
+
+
+
+
+
+
+The code for this post is [here]().
+
+
+
